@@ -15,6 +15,7 @@ import Bootstrap.ListGroup as ListGroup
 import Bootstrap.Text as Text
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser
+import Carwash as Carwash
 import Debug
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -37,45 +38,9 @@ main =
 
 
 type alias Model =
-    { carwashes : Maybe (List Carwash)
+    { carwashes : Maybe (List Carwash.Carwash)
     , accordionState : Accordion.State
     }
-
-
-type Carwash
-    = List Device
-
-
-type Device
-    = Washbox ( DeviceInfo, WashboxConfig, WashboxCounter )
-    | Exchange ( DeviceInfo, ExchangeConfig, ExchangeCounter )
-
-
-type alias DeviceInfo =
-    { deviceModel : String
-    , deviceVersion : String
-    , softVersion : String
-    }
-
-
-type alias ExchangeConfig =
-    { coinNominal : Int
-    , hopperCoinNominal : Int
-    }
-
-
-type alias ExchangeCounter =
-    { billCash : Int
-    , hopperCoin : Int
-    }
-
-
-type alias WashboxConfig =
-    { channelCount : Int }
-
-
-type alias WashboxCounter =
-    { coinCash : Int }
 
 
 init : () -> ( Model, Cmd Msg )
