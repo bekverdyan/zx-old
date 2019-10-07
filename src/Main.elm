@@ -152,4 +152,4 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Accordion.subscriptions model.accordionState SamuilArshak
+    Accordion.subscriptions model.accordionState AccordionMsg
