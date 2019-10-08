@@ -49,7 +49,7 @@ type alias Channel =
 
 
 type alias Component =
-    ( Resource, Unit )
+    ( Resource, Unit, Float )
 
 
 type alias Counter =
@@ -120,18 +120,18 @@ testData =
               , deviceVersion = "4.0.12"
               , softVersion = "1.1.32"
               }
-            , ( [ ( [ ( Electricity, Kilowatt )
-                    , ( Water, Liter )
-                    , ( Foam, Gram )
+            , ( [ ( [ ( Electricity, Kilowatt, 32.3 )
+                    , ( Water, Liter, 7 )
+                    , ( Foam, Gram, 4.8 )
                     ]
                   , 3
                   )
-                , ( [ ( Electricity, Kilowatt )
-                    , ( Water, Liter )
+                , ( [ ( Electricity, Kilowatt, 3.14 )
+                    , ( Water, Liter, 20 )
                     ]
                   , 5
                   )
-                , ( [ ( Wood, CubicMetre ) ], 6 )
+                , ( [ ( Wood, CubicMetre, 8 ) ], 6 )
                 ]
               , 6
               )
@@ -145,14 +145,14 @@ testData =
               , deviceVersion = "4.1.10"
               , softVersion = "2.1.0"
               }
-            , ( [ ( [ ( Electricity, Kilowatt )
-                    , ( Water, Liter )
-                    , ( Foam, Gram )
+            , ( [ ( [ ( Electricity, Kilowatt, 123 )
+                    , ( Water, Liter, 32 )
+                    , ( Foam, Gram, 0.95 )
                     ]
                   , 1
                   )
-                , ( [ ( Wood, CubicMetre )
-                    , ( Electricity, Kilowatt )
+                , ( [ ( Wood, CubicMetre, 5 )
+                    , ( Electricity, Kilowatt, 777 )
                     ]
                   , 6
                   )
