@@ -19,32 +19,43 @@ type alias DeviceInfo =
 
 
 -- WASHBOX
+-- Int value represents the total number of device inputs
 
 
-type WashboxConfig
-    = List Channel
+type alias WashboxConfig =
+    ( DefinedChannels, Int )
 
 
 
--- The Int value of a tuple is coun cash indicator
+-- The Int value of a tuple is count cash indicator
 
 
 type alias WashboxCounter =
-    ( List Channel, Int )
+    List Counter
+
+
+type alias DefinedChannels =
+    List Channel
 
 
 
 -- Int value represents the channel number
 
 
-type Channel
-    = Maybe ( List Component, Int )
+type alias Channel =
+    ( List Component, Int )
 
 
 type alias Component =
-    { resource : Resource
-    , unit : Unit
-    }
+    ( Resource, Unit )
+
+
+type alias Counter =
+    ( Int, Int )
+
+
+
+-- CONSTANTS
 
 
 type Unit
@@ -53,12 +64,14 @@ type Unit
     | Kilowatt
     | CubicMetre
     | Gram
+    | Second
 
 
 type Resource
     = Electricity
     | Water
     | Foam
+    | Wood
 
 
 
