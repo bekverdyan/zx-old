@@ -1,5 +1,7 @@
 module Carwash exposing (Carwash)
 
+import Html exposing (..)
+
 
 type alias Carwash =
     List Device
@@ -52,6 +54,23 @@ type alias Component =
 
 type alias Counter =
     ( Int, Int )
+
+
+
+-- UPDATE
+
+
+type Msg
+    = DeviceDetails
+
+
+
+-- VIEW
+
+
+viewCounter : Counter -> Html Msg
+viewCounter counter =
+    text "gago"
 
 
 
