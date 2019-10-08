@@ -1,5 +1,8 @@
 module Carwash exposing (Carwash)
 
+import Bootstrap.Form.Input as Input
+import Bootstrap.Form.InputGroup as InputGroup
+import Bootstrap.Table as Table
 import Html exposing (..)
 
 
@@ -68,9 +71,43 @@ type Msg
 -- VIEW
 
 
-viewCounter : Counter -> Html Msg
+viewChannel : Channel -> Html Msg
+viewChannel ( components, channelNumber ) =
+    text "samuil arshak"
+
+
+viewComponent : Component -> Html Msg
+viewComponent ( resource, unit, value ) =
+    div []
+        [ InputGroup.config
+            (InputGroup.number
+                [ Input.placeholder "value"
+                , Input.value <| String.fromFloat value
+                ]
+            )
+            |> InputGroup.predecessors
+                [ InputGroup.span [] [ text <| resourceToString resource ] ]
+            |> InputGroup.successors
+                [ InputGroup.span [] [ text <| unitToString unit ] ]
+            |> InputGroup.view
+        ]
+
+
+viewCounters : WashboxCounter -> Html Msg
+viewCounters counters =
+    Table.table
+        { options = [ Table.striped, Table.hover ]
+        , thead = Table.thead [] []
+        , tbody = Table.tbody [] (List.map viewCounter counters)
+        }
+
+
+viewCounter : Counter -> Table.Row Msg
 viewCounter counter =
-    text "gago"
+    Table.tr []
+        [ Table.td [] [ text (String.fromInt (Tuple.first counter)) ]
+        , Table.td [] [ text (String.fromInt (Tuple.second counter)) ]
+        ]
 
 
 
@@ -91,6 +128,44 @@ type Resource
     | Water
     | Foam
     | Wood
+
+
+unitToString : Unit -> String
+unitToString unit =
+    case unit of
+        Meter ->
+            "Meter"
+
+        Liter ->
+            "Liter"
+
+        Kilowatt ->
+            "Kilowatt"
+
+        CubicMetre ->
+            "CubicMetre"
+
+        Gram ->
+            "Gram"
+
+        Second ->
+            "Second"
+
+
+resourceToString : Resource -> String
+resourceToString resource =
+    case resource of
+        Electricity ->
+            "Electricity"
+
+        Water ->
+            "Water"
+
+        Foam ->
+            "Foam"
+
+        Wood ->
+            "Wood"
 
 
 
