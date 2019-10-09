@@ -12,10 +12,12 @@ import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.ListGroup as ListGroup
+import Bootstrap.Tab as Tab
 import Bootstrap.Text as Text
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser
 import Carwash as Carwash
+import Carwash.Model as CarwashModel
 import Debug
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -40,16 +42,23 @@ main =
 type alias Model =
     { carwashes : Maybe (List Carwash.Carwash)
     , accordionState : Accordion.State
+    , tabState : Tab.State
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model Nothing (Accordion.initialStateCardOpen "card1"), Cmd.none )
+    ( Model
+        Nothing
+        (Accordion.initialStateCardOpen "card1")
+        CarwashModel.tabState
+    , Cmd.none
+    )
 
 
 type Msg
     = AccordionMsg Accordion.State
+    | TabMsg Tab.State
 
 
 
@@ -61,6 +70,9 @@ update msg model =
     case msg of
         AccordionMsg accordionState ->
             ( { model | accordionState = accordionState }, Cmd.none )
+
+        TabMsg tabState ->
+            ( { model | tabState = tabState }, Cmd.none )
 
 
 
