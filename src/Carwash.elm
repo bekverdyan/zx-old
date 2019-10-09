@@ -1,9 +1,18 @@
-module Carwash exposing (Carwash)
+module Carwash exposing (Carwash, Model, Msg(..))
 
+import Bootstrap.Card as Card
+import Bootstrap.Card.Block as Block
 import Bootstrap.Form.Input as Input
 import Bootstrap.Form.InputGroup as InputGroup
+import Bootstrap.ListGroup as ListGroup
+import Bootstrap.Tab as Tab
 import Bootstrap.Table as Table
+import Bootstrap.Utilities.Spacing as Spacing
 import Html exposing (..)
+
+
+type alias Model =
+    { tabState : Tab.State }
 
 
 type alias Carwash =
@@ -64,21 +73,87 @@ type alias Counter =
 
 
 type Msg
-    = DeviceDetails
+    = TabMsg Tab.State
 
 
 
 -- VIEW
 
 
-viewChannel : Channel -> Html Msg
-viewChannel ( components, channelNumber ) =
-    text "samuil arshak"
+viewDeviceCard : Device -> ListGroup.Item Msg
+viewDeviceCard device =
+    case device of
+        Washbox ( info, configs, counters ) ->
+            ListGroup.li [] [ text info.deviceModel ]
+
+        Exchange ( info, configs, counters ) ->
+            ListGroup.li [] [ text "gago" ]
 
 
-viewComponent : Component -> Html Msg
-viewComponent ( resource, unit, value ) =
+viewDevice : Device -> Tab.State -> Html Msg
+viewDevice device tabState =
+    case device of
+        Washbox ( info, configs, counters ) ->
+            Card.config []
+                |> Card.block []
+                    [ Block.titleH4 [] [ text "Սազան վայրագ" ]
+                    , Block.text [] [ viewInfo info ]
+                    , Block.custom <| viewTabs configs counters tabState
+                    ]
+                |> Card.view
+
+        Exchange ( info, configs, counters ) ->
+            text "gago"
+
+
+viewInfo : DeviceInfo -> Html Msg
+viewInfo info =
     div []
+        [ span [] [ text <| "Model: " ++ info.deviceModel ]
+        , span [] [ text <| "Version: " ++ info.deviceVersion ]
+        , span [] [ text <| "Soft version: " ++ info.softVersion ]
+        ]
+
+
+viewTabs : WashboxConfig -> WashboxCounter -> Tab.State -> Html Msg
+viewTabs configs counters tabState =
+    Tab.config
+        TabMsg
+        |> Tab.items
+            [ Tab.item
+                { id = "counters"
+                , link = Tab.link [] [ text "Counters" ]
+                , pane = Tab.pane [ Spacing.mt3 ] [ viewCounters counters ]
+                }
+            , Tab.item
+                { id = "configs"
+                , link = Tab.link [] [ text "Configs" ]
+                , pane = Tab.pane [ Spacing.mt3 ] [ viewConfigs configs ]
+                }
+            ]
+        |> Tab.view tabState
+
+
+viewConfigs : WashboxConfig -> Html Msg
+viewConfigs ( definedChannels, channels ) =
+    Card.columns (List.map viewChannel definedChannels)
+
+
+viewChannel : Channel -> Card.Config Msg
+viewChannel ( components, channelNumber ) =
+    Card.config []
+        |> Card.headerH3 []
+            [ text <|
+                String.append "Channel " <|
+                    String.fromInt channelNumber
+            ]
+        |> Card.listGroup
+            (List.map viewComponent components)
+
+
+viewComponent : Component -> ListGroup.Item Msg
+viewComponent ( resource, unit, value ) =
+    ListGroup.li []
         [ InputGroup.config
             (InputGroup.number
                 [ Input.placeholder "value"
