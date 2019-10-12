@@ -1,4 +1,4 @@
-module Carwash exposing (Carwash, Model, Msg(..))
+module Carwash exposing (Carwash, Msg(..))
 
 import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
@@ -9,10 +9,6 @@ import Bootstrap.Tab as Tab
 import Bootstrap.Table as Table
 import Bootstrap.Utilities.Spacing as Spacing
 import Html exposing (..)
-
-
-type alias Model =
-    { tabState : Tab.State }
 
 
 type alias Carwash =

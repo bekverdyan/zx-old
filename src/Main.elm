@@ -17,7 +17,6 @@ import Bootstrap.Text as Text
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser
 import Carwash as Carwash
-import Carwash.Model as CarwashModel
 import Debug
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -41,7 +40,12 @@ main =
 
 type alias Model =
     { carwashes : Maybe (List Carwash.Carwash)
-    , accordionState : Accordion.State
+    , states : States
+    }
+
+
+type alias States =
+    { accordionState : Accordion.State
     , tabState : Tab.State
     }
 
@@ -50,8 +54,9 @@ init : () -> ( Model, Cmd Msg )
 init _ =
     ( Model
         Nothing
-        (Accordion.initialStateCardOpen "card1")
-        CarwashModel.tabState
+        { accordionState = Accordion.initialStateCardOpen "card1"
+        , tabState = Tab.initialState
+        }
     , Cmd.none
     )
 
@@ -69,10 +74,22 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         AccordionMsg accordionState ->
-            ( { model | accordionState = accordionState }, Cmd.none )
+            let
+                states =
+                    { accordionState = accordionState
+                    , tabState = model.states.tabState
+                    }
+            in
+            ( { model | states = states }, Cmd.none )
 
         TabMsg tabState ->
-            ( { model | tabState = tabState }, Cmd.none )
+            let
+                states =
+                    { accordionState = model.states.accordionState
+                    , tabState = tabState
+                    }
+            in
+            ( { model | states = states }, Cmd.none )
 
 
 
@@ -124,9 +141,9 @@ view model =
                     ]
                 }
             ]
-        |> Accordion.view model.accordionState
+        |> Accordion.view model.states.accordionState
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Accordion.subscriptions model.accordionState AccordionMsg
+    Accordion.subscriptions model.states.accordionState AccordionMsg
