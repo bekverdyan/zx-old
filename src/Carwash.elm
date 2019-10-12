@@ -80,8 +80,8 @@ type Msg
 -- VIEW
 
 
-viewDeviceCard : Device -> ListGroup.Item Msg
-viewDeviceCard device =
+viewDeviceAsListElement : Device -> ListGroup.Item Msg
+viewDeviceAsListElement device =
     case device of
         Washbox ( info, configs, counters ) ->
             ListGroup.li [] [ text info.deviceModel ]
