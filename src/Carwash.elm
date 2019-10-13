@@ -1,6 +1,7 @@
 module Carwash exposing (Carwash, Msg(..), testData, viewCarwashAsCard, viewDevice, viewDeviceAsListElement)
 
 import Bootstrap.Accordion as Accordion
+import Bootstrap.Button as Button
 import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
 import Bootstrap.Form.Input as Input
@@ -104,7 +105,13 @@ viewDeviceAsListElement : Device -> ListGroup.Item Msg
 viewDeviceAsListElement device =
     case device of
         Washbox ( info, configs, counters ) ->
-            ListGroup.li [] [ text info.deviceModel ]
+            ListGroup.li []
+                [ Button.button
+                    [ Button.light
+                    , Button.attrs [ onClick <| SelectDevice device ]
+                    ]
+                    [ text info.deviceModel ]
+                ]
 
         Exchange ( info, configs, counters ) ->
             ListGroup.li [] [ text "gago" ]
