@@ -1,5 +1,6 @@
 module Carwash exposing (Carwash, Msg(..))
 
+import Bootstrap.Accordion as Accordion
 import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
 import Bootstrap.Form.Input as Input
@@ -7,8 +8,10 @@ import Bootstrap.Form.InputGroup as InputGroup
 import Bootstrap.ListGroup as ListGroup
 import Bootstrap.Tab as Tab
 import Bootstrap.Table as Table
+import Bootstrap.Text as Text
 import Bootstrap.Utilities.Spacing as Spacing
 import Html exposing (..)
+import Html.Attributes exposing (..)
 
 
 type alias Carwash =
@@ -74,6 +77,24 @@ type Msg
 
 
 -- VIEW
+
+
+viewCarwashAsCard : Carwash -> Accordion.Card Msg
+viewCarwashAsCard carwash =
+    Accordion.card
+        { id = "card2"
+        , options = [ Card.outlineSuccess, Card.align Text.alignXsCenter ]
+        , header =
+            Accordion.headerH3 []
+                (Accordion.toggle [] [ text " Card 2" ])
+                |> Accordion.prependHeader
+                    [ span [ class "fa fa-taxi" ] [] ]
+        , blocks =
+            [ Accordion.block []
+                [ Block.text [] [ text "Lorem ipsum etc" ] ]
+            , Accordion.listGroup <| List.map viewDeviceAsListElement carwash
+            ]
+        }
 
 
 viewDeviceAsListElement : Device -> ListGroup.Item Msg
