@@ -1,4 +1,4 @@
-module Carwash exposing (Carwash, Msg(..))
+module Carwash exposing (Carwash, Msg(..), testData, viewCarwashAsCard, viewDeviceAsListElement)
 
 import Bootstrap.Accordion as Accordion
 import Bootstrap.Card as Card
@@ -15,7 +15,10 @@ import Html.Attributes exposing (..)
 
 
 type alias Carwash =
-    List Device
+    { id : String
+    , name : String
+    , devices : List Device
+    }
 
 
 type Device
@@ -72,7 +75,8 @@ type alias Counter =
 
 
 type Msg
-    = TabMsg Tab.State
+    = AccordionMsg Accordion.State
+    | TabMsg Tab.State
 
 
 
@@ -82,18 +86,15 @@ type Msg
 viewCarwashAsCard : Carwash -> Accordion.Card Msg
 viewCarwashAsCard carwash =
     Accordion.card
-        { id = "card2"
+        { id = carwash.id
         , options = [ Card.outlineSuccess, Card.align Text.alignXsCenter ]
         , header =
             Accordion.headerH3 []
-                (Accordion.toggle [] [ text " Card 2" ])
+                (Accordion.toggle [] [ text carwash.name ])
                 |> Accordion.prependHeader
                     [ span [ class "fa fa-taxi" ] [] ]
         , blocks =
-            [ Accordion.block []
-                [ Block.text [] [ text "Lorem ipsum etc" ] ]
-            , Accordion.listGroup <| List.map viewDeviceAsListElement carwash
-            ]
+            [ Accordion.listGroup <| List.map viewDeviceAsListElement carwash.devices ]
         }
 
 
@@ -282,54 +283,58 @@ type alias ExchangeCounter =
 
 testData : List Carwash
 testData =
-    [ [ Washbox
-            ( { deviceModel = "samuil arshak"
-              , deviceVersion = "4.0.12"
-              , softVersion = "1.1.32"
-              }
-            , ( [ ( [ ( Electricity, Kilowatt, 32.3 )
-                    , ( Water, Liter, 7 )
-                    , ( Foam, Gram, 4.8 )
-                    ]
-                  , 3
-                  )
-                , ( [ ( Electricity, Kilowatt, 3.14 )
-                    , ( Water, Liter, 20 )
-                    ]
-                  , 5
-                  )
-                , ( [ ( Wood, CubicMetre, 8 ) ], 6 )
-                ]
-              , 6
-              )
-            , [ ( 1, 1270 )
-              , ( 5, 4532 )
-              , ( 6, 1234 )
-              ]
-            )
-      , Washbox
-            ( { deviceModel = "daniel mastrurb"
-              , deviceVersion = "4.1.10"
-              , softVersion = "2.1.0"
-              }
-            , ( [ ( [ ( Electricity, Kilowatt, 123 )
-                    , ( Water, Liter, 32 )
-                    , ( Foam, Gram, 0.95 )
-                    ]
-                  , 1
-                  )
-                , ( [ ( Wood, CubicMetre, 5 )
-                    , ( Electricity, Kilowatt, 777 )
+    [ { id = "7465732"
+      , name = "քուչի մոյկա"
+      , devices =
+            [ Washbox
+                ( { deviceModel = "samuil arshak"
+                  , deviceVersion = "4.0.12"
+                  , softVersion = "1.1.32"
+                  }
+                , ( [ ( [ ( Electricity, Kilowatt, 32.3 )
+                        , ( Water, Liter, 7 )
+                        , ( Foam, Gram, 4.8 )
+                        ]
+                      , 3
+                      )
+                    , ( [ ( Electricity, Kilowatt, 3.14 )
+                        , ( Water, Liter, 20 )
+                        ]
+                      , 5
+                      )
+                    , ( [ ( Wood, CubicMetre, 8 ) ], 6 )
                     ]
                   , 6
                   )
-                ]
-              , 5
-              )
-            , [ ( 1, 4278 )
-              , ( 5, 1870 )
-              , ( 2, 3910 )
-              ]
-            )
-      ]
+                , [ ( 1, 1270 )
+                  , ( 5, 4532 )
+                  , ( 6, 1234 )
+                  ]
+                )
+            , Washbox
+                ( { deviceModel = "daniel mastrurb"
+                  , deviceVersion = "4.1.10"
+                  , softVersion = "2.1.0"
+                  }
+                , ( [ ( [ ( Electricity, Kilowatt, 123 )
+                        , ( Water, Liter, 32 )
+                        , ( Foam, Gram, 0.95 )
+                        ]
+                      , 1
+                      )
+                    , ( [ ( Wood, CubicMetre, 5 )
+                        , ( Electricity, Kilowatt, 777 )
+                        ]
+                      , 6
+                      )
+                    ]
+                  , 5
+                  )
+                , [ ( 1, 4278 )
+                  , ( 5, 1870 )
+                  , ( 2, 3910 )
+                  ]
+                )
+            ]
+      }
     ]

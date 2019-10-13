@@ -39,7 +39,7 @@ main =
 
 
 type alias Model =
-    { carwashes : Maybe (List Carwash.Carwash)
+    { carwashes : List Carwash.Carwash
     , states : States
     }
 
@@ -53,7 +53,7 @@ type alias States =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( Model
-        Nothing
+        Carwash.testData
         { accordionState = Accordion.initialStateCardOpen "card1"
         , tabState = Tab.initialState
         }
@@ -61,19 +61,14 @@ init _ =
     )
 
 
-type Msg
-    = AccordionMsg Accordion.State
-    | TabMsg Tab.State
-
-
-
--- UPDATE
+type alias Msg =
+    Carwash.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        AccordionMsg accordionState ->
+        Carwash.AccordionMsg accordionState ->
             let
                 states =
                     { accordionState = accordionState
@@ -82,7 +77,7 @@ update msg model =
             in
             ( { model | states = states }, Cmd.none )
 
-        TabMsg tabState ->
+        Carwash.TabMsg tabState ->
             let
                 states =
                     { accordionState = model.states.accordionState
@@ -98,52 +93,12 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    Accordion.config AccordionMsg
+    Accordion.config Carwash.AccordionMsg
         |> Accordion.withAnimation
-        |> Accordion.cards
-            [ Accordion.card
-                { id = "card1"
-                , options =
-                    [ Card.outlineSuccess
-                    , Card.align Text.alignXsCenter
-                    ]
-                , header =
-                    Accordion.headerH3 []
-                        (Accordion.toggle [] [ text " Card 1" ])
-                        |> Accordion.prependHeader
-                            [ span [ class "fa fa-car" ] [] ]
-                , blocks =
-                    [ Accordion.block [ Block.align Text.alignXsLeft ]
-                        [ Block.titleH4 [] [ text "Block title" ]
-                        , Block.text [] [ text "Lorem ipsum etc" ]
-                        ]
-                    , Accordion.block [ Block.align Text.alignXsRight ]
-                        [ Block.titleH4 [] [ text "Block2 title" ]
-                        , Block.text [] [ text "Lorem ipsum etc" ]
-                        ]
-                    ]
-                }
-            , Accordion.card
-                { id = "card2"
-                , options = [ Card.outlineSuccess, Card.align Text.alignXsCenter ]
-                , header =
-                    Accordion.headerH3 []
-                        (Accordion.toggle [] [ text " Card 2" ])
-                        |> Accordion.prependHeader
-                            [ span [ class "fa fa-taxi" ] [] ]
-                , blocks =
-                    [ Accordion.block []
-                        [ Block.text [] [ text "Lorem ipsum etc" ] ]
-                    , Accordion.listGroup
-                        [ ListGroup.li [] [ text "List item 1" ]
-                        , ListGroup.li [] [ text "List item 2" ]
-                        ]
-                    ]
-                }
-            ]
+        |> Accordion.cards (List.map Carwash.viewCarwashAsCard model.carwashes)
         |> Accordion.view model.states.accordionState
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Accordion.subscriptions model.states.accordionState AccordionMsg
+    Accordion.subscriptions model.states.accordionState Carwash.AccordionMsg
