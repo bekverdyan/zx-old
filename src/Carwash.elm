@@ -90,7 +90,10 @@ viewCarwashAsCard carwash =
                 |> Accordion.prependHeader
                     [ span [ class "fa fa-taxi" ] [] ]
         , blocks =
-            [ Accordion.listGroup <| List.map viewDeviceAsListElement carwash ]
+            [ Accordion.block []
+                [ Block.text [] [ text "Lorem ipsum etc" ] ]
+            , Accordion.listGroup <| List.map viewDeviceAsListElement carwash
+            ]
         }
 
 
