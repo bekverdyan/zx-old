@@ -1,4 +1,4 @@
-module Carwash exposing (Carwash, Msg(..), testData, viewCarwashAsCard, viewDeviceAsListElement)
+module Carwash exposing (Carwash, Msg(..), testData, viewCarwashAsCard, viewDevice, viewDeviceAsListElement)
 
 import Bootstrap.Accordion as Accordion
 import Bootstrap.Card as Card
@@ -12,6 +12,7 @@ import Bootstrap.Text as Text
 import Bootstrap.Utilities.Spacing as Spacing
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 
 
 type alias Carwash =
@@ -77,6 +78,7 @@ type alias Counter =
 type Msg
     = AccordionMsg Accordion.State
     | TabMsg Tab.State
+    | SelectDevice Device
 
 
 

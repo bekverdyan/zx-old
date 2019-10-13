@@ -47,6 +47,7 @@ type alias Model =
 type alias States =
     { accordionState : Accordion.State
     , tabState : Tab.State
+    , showDevice : Bool
     }
 
 
@@ -56,6 +57,7 @@ init _ =
         Carwash.testData
         { accordionState = Accordion.initialStateCardOpen "card1"
         , tabState = Tab.initialState
+        , showDevice = True
         }
     , Cmd.none
     )
@@ -73,6 +75,7 @@ update msg model =
                 states =
                     { accordionState = accordionState
                     , tabState = model.states.tabState
+                    , showDevice = model.states.showDevice
                     }
             in
             ( { model | states = states }, Cmd.none )
@@ -82,9 +85,13 @@ update msg model =
                 states =
                     { accordionState = model.states.accordionState
                     , tabState = tabState
+                    , showDevice = model.states.showDevice
                     }
             in
             ( { model | states = states }, Cmd.none )
+
+        Carwash.SelectDevice device ->
+            ( model, Cmd.none )
 
 
 
@@ -93,10 +100,18 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    Accordion.config Carwash.AccordionMsg
-        |> Accordion.withAnimation
-        |> Accordion.cards (List.map Carwash.viewCarwashAsCard model.carwashes)
-        |> Accordion.view model.states.accordionState
+    Grid.container []
+        [ Grid.row []
+            [ Grid.col []
+                [ Accordion.config
+                    Carwash.AccordionMsg
+                    |> Accordion.withAnimation
+                    |> Accordion.cards (List.map Carwash.viewCarwashAsCard model.carwashes)
+                    |> Accordion.view model.states.accordionState
+                ]
+            , Grid.col [] []
+            ]
+        ]
 
 
 subscriptions : Model -> Sub Msg
