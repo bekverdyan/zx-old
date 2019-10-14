@@ -80,8 +80,6 @@ type Msg
     = AccordionMsg Accordion.State
     | TabMsg Tab.State
     | SelectDevice Device
-    | OpenDevice
-    | CarwashesOnly
 
 
 
@@ -165,25 +163,25 @@ viewTabs configs counters tabState =
 
 viewConfigs : WashboxConfig -> Html Msg
 viewConfigs ( definedChannels, channels ) =
-    Card.columns (List.map viewChannel definedChannels)
+    div [] <| List.map viewChannel definedChannels
 
 
-viewChannel : Channel -> Card.Config Msg
+viewChannel : Channel -> Html Msg
 viewChannel ( components, channelNumber ) =
-    Card.config []
+    Card.config [ Card.outlineDark ]
         |> Card.headerH3 []
             [ text <|
                 String.append "Channel " <|
                     String.fromInt channelNumber
             ]
-        |> Card.listGroup
-            (List.map viewComponent components)
+        |> Card.block [] (List.map viewComponent components)
+        |> Card.view
 
 
-viewComponent : Component -> ListGroup.Item Msg
+viewComponent : Component -> Block.Item Msg
 viewComponent ( resource, unit, value ) =
-    ListGroup.li []
-        [ InputGroup.config
+    Block.custom
+        (InputGroup.config
             (InputGroup.number
                 [ Input.placeholder "value"
                 , Input.value <| String.fromFloat value
@@ -194,7 +192,7 @@ viewComponent ( resource, unit, value ) =
             |> InputGroup.successors
                 [ InputGroup.span [] [ text <| unitToString unit ] ]
             |> InputGroup.view
-        ]
+        )
 
 
 viewCounters : WashboxCounter -> Html Msg

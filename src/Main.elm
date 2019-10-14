@@ -17,7 +17,6 @@ import Bootstrap.Text as Text
 import Bootstrap.Utilities.Spacing as Spacing
 import Browser
 import Carwash as Carwash
-import Debug
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
@@ -47,8 +46,13 @@ type alias Model =
 type alias States =
     { accordionState : Accordion.State
     , tabState : Tab.State
-    , showDevice : Bool
+    , viewMode : ViewMode
     }
+
+
+type ViewMode
+    = CarwashesOnly
+    | CarwashesWithDevice Carwash.Device
 
 
 init : () -> ( Model, Cmd Msg )
@@ -57,7 +61,7 @@ init _ =
         Carwash.testData
         { accordionState = Accordion.initialStateCardOpen "card1"
         , tabState = Tab.initialState
-        , showDevice = True
+        , viewMode = CarwashesOnly
         }
     , Cmd.none
     )
@@ -75,7 +79,7 @@ update msg model =
                 states =
                     { accordionState = accordionState
                     , tabState = model.states.tabState
-                    , showDevice = model.states.showDevice
+                    , viewMode = model.states.viewMode
                     }
             in
             ( { model | states = states }, Cmd.none )
@@ -85,13 +89,20 @@ update msg model =
                 states =
                     { accordionState = model.states.accordionState
                     , tabState = tabState
-                    , showDevice = model.states.showDevice
+                    , viewMode = model.states.viewMode
                     }
             in
             ( { model | states = states }, Cmd.none )
 
         Carwash.SelectDevice device ->
-            ( model, Cmd.none )
+            let
+                states =
+                    { accordionState = model.states.accordionState
+                    , tabState = model.states.tabState
+                    , viewMode = CarwashesWithDevice device
+                    }
+            in
+            ( { model | states = states }, Cmd.none )
 
 
 
@@ -100,10 +111,12 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ Html.map (\_ -> Carwash.OpenDevice) (text "")
-        , Html.map (\_ -> Carwash.CarwashesOnly) (text "hghgh")
-        ]
+    case model.states.viewMode of
+        CarwashesOnly ->
+            viewCarwashes model.carwashes model.states.accordionState
+
+        CarwashesWithDevice device ->
+            viewCarwashesWithSelectedDevice model.carwashes model.states.accordionState device model.states.tabState
 
 
 viewCarwashes : List Carwash.Carwash -> Accordion.State -> Html Msg
@@ -132,7 +145,7 @@ viewCarwashesWithSelectedDevice carwashes accordionState device tabState =
                     |> Accordion.cards (List.map Carwash.viewCarwashAsCard carwashes)
                     |> Accordion.view accordionState
                 ]
-            , Grid.col [] []
+            , Grid.col [] [ Carwash.viewDevice device tabState ]
             ]
         ]
 
