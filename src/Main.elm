@@ -100,14 +100,37 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
+    div []
+        [ Html.map (\_ -> Carwash.OpenDevice) (text "")
+        , Html.map (\_ -> Carwash.CarwashesOnly) (text "hghgh")
+        ]
+
+
+viewCarwashes : List Carwash.Carwash -> Accordion.State -> Html Msg
+viewCarwashes carwashes accordionState =
     Grid.container []
         [ Grid.row []
             [ Grid.col []
                 [ Accordion.config
                     Carwash.AccordionMsg
                     |> Accordion.withAnimation
-                    |> Accordion.cards (List.map Carwash.viewCarwashAsCard model.carwashes)
-                    |> Accordion.view model.states.accordionState
+                    |> Accordion.cards (List.map Carwash.viewCarwashAsCard carwashes)
+                    |> Accordion.view accordionState
+                ]
+            ]
+        ]
+
+
+viewCarwashesWithSelectedDevice : List Carwash.Carwash -> Accordion.State -> Carwash.Device -> Tab.State -> Html Msg
+viewCarwashesWithSelectedDevice carwashes accordionState device tabState =
+    Grid.container []
+        [ Grid.row []
+            [ Grid.col []
+                [ Accordion.config
+                    Carwash.AccordionMsg
+                    |> Accordion.withAnimation
+                    |> Accordion.cards (List.map Carwash.viewCarwashAsCard carwashes)
+                    |> Accordion.view accordionState
                 ]
             , Grid.col [] []
             ]

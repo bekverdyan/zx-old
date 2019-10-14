@@ -1,4 +1,4 @@
-module Carwash exposing (Carwash, Msg(..), testData, viewCarwashAsCard, viewDevice, viewDeviceAsListElement)
+module Carwash exposing (Carwash, Device, Msg(..), testData, viewCarwashAsCard, viewDevice, viewDeviceAsListElement)
 
 import Bootstrap.Accordion as Accordion
 import Bootstrap.Button as Button
@@ -80,6 +80,8 @@ type Msg
     = AccordionMsg Accordion.State
     | TabMsg Tab.State
     | SelectDevice Device
+    | OpenDevice
+    | CarwashesOnly
 
 
 
