@@ -1,6 +1,9 @@
 module Device exposing (Model)
 
 import Bootstrap.Tab as Tab
+import Html exposing (..)
+import Html.Attributes
+import Html.Events
 
 
 
@@ -28,5 +31,33 @@ type alias WashboxData =
 
 type alias ExchangeData =
     { info : String
+    , config : Int
+    , counter : Int
     , log : Int
     }
+
+
+
+--UPDATE
+
+
+type Msg
+    = ChangeConfig
+
+
+
+-- VIEW
+
+
+view : Model -> Html Msg
+view model =
+    let
+        device =
+            model.device
+    in
+    case device of
+        Washbox data ->
+            text "washbox"
+
+        Exchange data ->
+            text "exchange"
