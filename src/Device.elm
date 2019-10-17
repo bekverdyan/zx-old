@@ -16,24 +16,61 @@ type alias Model =
     }
 
 
-type Device
-    = Washbox WashboxData
-    | Exchange ExchangeData
-
-
-type alias WashboxData =
+type alias Device =
     { info : String
-    , config : Int
-    , counter : Int
+    , config : Config
+    , counter : Counter
     , log : Int
     }
 
 
-type alias ExchangeData =
-    { info : String
-    , config : Int
-    , counter : Int
-    , log : Int
+type Config
+    = WashboxConfig
+    | ExchangeConfig
+
+
+type Counter
+    = WashboxCounter
+    | ExchangeCounterWashboxCounter
+
+
+type alias ExchangeConfig =
+    { coinNominal : Int
+    , hopperCoinNominal : Int
+    }
+
+
+type alias ExchangeCounter =
+    { billCash : Int
+    , hopperCoin : Int
+    }
+
+
+type alias WashboxConfig =
+    { definedChannels : List Channel
+    , actualChannels : Int
+    }
+
+
+type alias Channel =
+    { id : Int
+    , components : List Component
+    }
+
+
+type alias Component =
+    { type_ : String
+    , unit : String
+    }
+
+
+type alias WashboxCounter =
+    List CounterData
+
+
+type alias CounterData =
+    { channelId : Int
+    , pointer : Int
     }
 
 
@@ -55,9 +92,4 @@ view model =
         device =
             model.device
     in
-    case device of
-        Washbox data ->
-            text "washbox"
-
-        Exchange data ->
-            text "exchange"
+    text device.info
