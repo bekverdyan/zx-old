@@ -25,13 +25,15 @@ type alias Device =
 
 
 type Config
-    = WashboxConfig
-    | ExchangeConfig
+    = Washbox Int (List Channel)
+    | Exchange Int Int
 
 
-type Counter
-    = WashboxCounter
-    | ExchangeCounterWashboxCounter
+type alias Counter =
+    { channelId : Int
+    , component : Component
+    , pointer : Int
+    }
 
 
 type alias ExchangeConfig =
