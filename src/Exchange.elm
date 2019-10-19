@@ -1,5 +1,7 @@
 module Exchange exposing (Model)
 
+import Bootstrap.Button as Button
+import Bootstrap.ButtonGroup as ButtonGroup
 import Bootstrap.Table as Table
 import Html exposing (..)
 
@@ -9,6 +11,24 @@ import Html exposing (..)
 
 
 type alias Model =
+    { exchange : Exchange
+    , switches : Switches
+    }
+
+
+type alias Switches =
+    { hopper : Switch
+    , hopperMode : Switch
+    , billValidator : Switch
+    , rfidReader1 : Switch
+    , rfidReader2 : Switch
+    , dispenser : Switch
+    , cardOut : Switch
+    , network : Switch
+    }
+
+
+type alias Exchange =
     { counters : Counters
     , settings : Settings
     }
@@ -75,7 +95,7 @@ defaultSettings =
     , billNominal = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ] -- array of 10 integers
     , rfidReader1 = disabled -- disabled | enabled
     , rfidReader2 = disabled -- disabled | enabled
-    , dispenser = disabled -- disabled | crt531 tcd820M
+    , dispenser = disabled -- disabled | crt531 | tcd820M
     , cardOut = toGate -- toGate | fullOut
     , cardPrice = 0
     , network = none -- none | rs485 | can | ethernet | wifi
@@ -103,7 +123,7 @@ ccTalk =
 
 pulse : Int
 pulse =
-    1
+    2
 
 
 mode1 : Int
@@ -166,7 +186,219 @@ wifi =
 
 
 type Msg
-    = SaveConfig
+    = SaveSetting
+    | RadioMsg Switch
+
+
+type Setting
+    = Int
+    | String
+    | Swithch
+
+
+type Switch
+    = Hopper Faze
+    | HopperMode Faze
+    | BillValidator Faze
+    | BillNominal Faze
+    | RfidReader1 Faze
+    | RfidReader2 Faze
+    | Dispenser Faze
+    | CardOut Faze
+    | Network Faze
+
+
+type Faze
+    = Enabled
+    | Disabled
+    | CcTalk
+    | Pulse
+    | Mode_1
+    | Mode_2
+    | CRT_531
+    | TCD_820M
+    | ToGate
+    | FullOut
+    | None
+    | RS_485
+    | Can
+    | Ethernet
+    | WiFi
+
+
+update : Msg -> Model -> ( Model, Maybe Msg )
+update msg model =
+    case msg of
+        RadioMsg switch ->
+            let
+                settings =
+                    model.exchange.settings
+            in
+            case switch of
+                Hopper faze ->
+                    ( changeSettings (setHopper faze settings) model, Nothing )
+
+                HopperMode faze ->
+                    ( changeSettings (setHopperMode faze settings) model, Nothing )
+
+                BillValidator faze ->
+                    ( changeSettings (setBillValidator faze settings) model, Nothing )
+
+                BillNominal faze ->
+                    ( changeSettings (setBillNominal faze settings) model, Nothing )
+
+                RfidReader1 faze ->
+                    ( changeSettings (setRfidReader1 faze settings) model, Nothing )
+
+                RfidReader2 faze ->
+                    ( changeSettings (setRfidReader2 faze settings) model, Nothing )
+
+                Dispenser faze ->
+                    ( changeSettings (setDispenser faze settings) model, Nothing )
+
+                CardOut faze ->
+                    ( changeSettings (setCardOut faze settings) model, Nothing )
+
+                Network faze ->
+                    ( changeSettings (setNetwork faze settings) model, Nothing )
+
+        SaveSetting ->
+            ( model, Nothing )
+
+
+changeSettings : Settings -> Model -> Model
+changeSettings settings model =
+    let
+        exchange =
+            model.exchange
+    in
+    { model | exchange = { exchange | settings = settings } }
+
+
+setHopper : Faze -> Settings -> Settings
+setHopper faze settings =
+    case faze of
+        Disabled ->
+            { settings | hopper = 0 }
+
+        CcTalk ->
+            { settings | hopper = 1 }
+
+        Pulse ->
+            { settings | hopper = 2 }
+
+        _ ->
+            settings
+
+
+setHopperMode : Faze -> Settings -> Settings
+setHopperMode faze settings =
+    case faze of
+        Mode_1 ->
+            { settings | hopperMode = 0 }
+
+        Mode_2 ->
+            { settings | hopperMode = 1 }
+
+        _ ->
+            settings
+
+
+setBillValidator : Faze -> Settings -> Settings
+setBillValidator faze settings =
+    case faze of
+        Disabled ->
+            { settings | billValidator = 0 }
+
+        CcTalk ->
+            { settings | billValidator = 1 }
+
+        _ ->
+            settings
+
+
+setBillNominal : Faze -> Settings -> Settings
+setBillNominal faze settings =
+    case faze of
+        _ ->
+            settings
+
+
+setRfidReader1 : Faze -> Settings -> Settings
+setRfidReader1 faze settings =
+    case faze of
+        Disabled ->
+            { settings | rfidReader1 = 0 }
+
+        Enabled ->
+            { settings | rfidReader1 = 1 }
+
+        _ ->
+            settings
+
+
+setRfidReader2 : Faze -> Settings -> Settings
+setRfidReader2 faze settings =
+    case faze of
+        Disabled ->
+            { settings | rfidReader2 = 0 }
+
+        Enabled ->
+            { settings | rfidReader2 = 1 }
+
+        _ ->
+            settings
+
+
+setDispenser : Faze -> Settings -> Settings
+setDispenser faze settings =
+    case faze of
+        Disabled ->
+            { settings | dispenser = 0 }
+
+        CRT_531 ->
+            { settings | dispenser = 1 }
+
+        TCD_820M ->
+            { settings | dispenser = 2 }
+
+        _ ->
+            settings
+
+
+setCardOut : Faze -> Settings -> Settings
+setCardOut faze settings =
+    case faze of
+        ToGate ->
+            { settings | cardOut = 0 }
+
+        FullOut ->
+            { settings | cardOut = 1 }
+
+        _ ->
+            settings
+
+
+setNetwork : Faze -> Settings -> Settings
+setNetwork faze settings =
+    case faze of
+        None ->
+            { settings | network = 0 }
+
+        RS_485 ->
+            { settings | network = 1 }
+
+        Can ->
+            { settings | network = 2 }
+
+        Ethernet ->
+            { settings | network = 3 }
+
+        WiFi ->
+            { settings | network = 4 }
+
+        _ ->
+            settings
 
 
 
@@ -208,3 +440,33 @@ viewCounter pointers name =
                     Tuple.second pointers
             ]
         ]
+
+
+viewSettings : Settings -> Html Msg
+viewSettings settings =
+    Table.table
+        { options = []
+        , thead = Table.thead [] []
+        , tbody =
+            Table.tbody []
+                []
+        }
+
+
+
+-- viewSetting : Setting -> String -> Html Msg
+-- viewSetting dvijeni name =
+--     ButtonGroup.radioButtonGroup []
+--         [ ButtonGroup.radioButton
+--             (model.radioState == One)
+--             [ Button.primary, Button.onClick <| RadioMsg One ]
+--             [ text "One" ]
+--         , ButtonGroup.radioButton
+--             (model.radioState == Two)
+--             [ Button.primary, Button.onClick <| RadioMsg Two ]
+--             [ text "Two" ]
+--         , ButtonGroup.radioButton
+--             (model.radioState == Three)
+--             [ Button.primary, Button.onClick <| RadioMsg Three ]
+--             [ text "Three" ]
+--         ]
