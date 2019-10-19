@@ -1,5 +1,10 @@
 module Exchange exposing (Model)
 
+import Bootstrap.Table as Table
+import Html exposing (..)
+
+
+
 --MODEL
 
 
@@ -157,4 +162,49 @@ wifi =
 
 
 
+--UPDATE
+
+
+type Msg
+    = SaveConfig
+
+
+
 -- VIEW
+
+
+viewCounters : Counters -> Html Msg
+viewCounters counters =
+    Table.table
+        { options = [ Table.striped, Table.hover ]
+        , thead = Table.thead [] []
+        , tbody =
+            Table.tbody []
+                [ viewCounter counters.billCach "Bill Cach"
+                , viewCounter counters.coinCach "Coin Cach"
+                , viewCounter counters.cardRechargeCach "Card Rechange Cach"
+                , viewCounter counters.soldCardCach "Sold Card Cach"
+                , viewCounter counters.cardDispense "Card Dispense"
+                , viewCounter counters.faultyCard "Faulty Card"
+                , viewCounter counters.coinHopperCoin "Coin HopperCoin"
+                , viewCounter counters.coinHopperValue "Coin Hopper Value"
+                , viewCounter counters.bonusCache "Bonus Cache"
+                ]
+        }
+
+
+viewCounter : ( Int, Int ) -> String -> Table.Row Msg
+viewCounter pointers name =
+    Table.tr []
+        [ Table.td [] [ text name ]
+        , Table.td []
+            [ text <|
+                String.fromInt <|
+                    Tuple.first pointers
+            ]
+        , Table.td []
+            [ text <|
+                String.fromInt <|
+                    Tuple.second pointers
+            ]
+        ]
