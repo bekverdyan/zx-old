@@ -2,8 +2,12 @@ module Exchange exposing (Model)
 
 import Bootstrap.Button as Button
 import Bootstrap.ButtonGroup as ButtonGroup
+import Bootstrap.Form.Input as Input
+import Bootstrap.Form.InputGroup as InputGroup
 import Bootstrap.Table as Table
 import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 
 
 
@@ -49,17 +53,17 @@ type alias Counters =
 
 type alias Settings =
     { coinNominal : Int
-    , hopper : Int
+    , hopper : Faze
     , hopperCoinNominal : Int
-    , hopperMode : Int
-    , billValidator : Int
+    , hopperMode : Faze
+    , billValidator : Faze
     , billNominal : List Int
-    , rfidReader1 : Int
-    , rfidReader2 : Int
-    , dispenser : Int
-    , cardOut : Int
+    , rfidReader1 : Faze
+    , rfidReader2 : Faze
+    , dispenser : Faze
+    , cardOut : Faze
     , cardPrice : Int
-    , network : Int
+    , network : Faze
     , deviceId : String
     , serverCode : String
     , bonusPercent : Int
@@ -88,17 +92,17 @@ defaultCounters =
 defaultSettings : Settings
 defaultSettings =
     { coinNominal = 0
-    , hopper = disabled -- Hopper state disabled | ccTalk | Pulse
+    , hopper = Disabled
     , hopperCoinNominal = 0
-    , hopperMode = mode1 -- mode1 | mode2
-    , billValidator = disabled -- disabled | ccTalk
-    , billNominal = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ] -- array of 10 integers
-    , rfidReader1 = disabled -- disabled | enabled
-    , rfidReader2 = disabled -- disabled | enabled
-    , dispenser = disabled -- disabled | crt531 | tcd820M
-    , cardOut = toGate -- toGate | fullOut
+    , hopperMode = Mode_1
+    , billValidator = Disabled
+    , billNominal = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+    , rfidReader1 = Disabled
+    , rfidReader2 = Disabled
+    , dispenser = Disabled
+    , cardOut = ToGate
     , cardPrice = 0
-    , network = none -- none | rs485 | can | ethernet | wifi
+    , network = None
     , deviceId = ""
     , serverCode = ""
     , bonusPercent = 0
@@ -106,106 +110,35 @@ defaultSettings =
     }
 
 
-enabled : Int
-enabled =
-    1
-
-
-disabled : Int
-disabled =
-    0
-
-
-ccTalk : Int
-ccTalk =
-    1
-
-
-pulse : Int
-pulse =
-    2
-
-
-mode1 : Int
-mode1 =
-    0
-
-
-mode2 : Int
-mode2 =
-    1
-
-
-crt531 : Int
-crt531 =
-    1
-
-
-tcd820M : Int
-tcd820M =
-    2
-
-
-toGate : Int
-toGate =
-    0
-
-
-fullOut : Int
-fullOut =
-    1
-
-
-none : Int
-none =
-    0
-
-
-rs485 : Int
-rs485 =
-    1
-
-
-can : Int
-can =
-    2
-
-
-ethernet : Int
-ethernet =
-    3
-
-
-wifi : Int
-wifi =
-    4
-
-
 
 --UPDATE
 
 
 type Msg
-    = SaveSetting
-    | RadioMsg Switch
-
-
-type Setting
-    = Int
-    | String
-    | Swithch
+    = RadioMsg Switch
+    | Inputs Variable
 
 
 type Switch
     = Hopper Faze
     | HopperMode Faze
     | BillValidator Faze
-    | BillNominal Faze
     | RfidReader1 Faze
     | RfidReader2 Faze
     | Dispenser Faze
     | CardOut Faze
     | Network Faze
+
+
+type Variable
+    = CoinNominal Int
+    | HopperCoinNominal Int
+    | BillNominal (List Int)
+    | DeviceId String
+    | ServerCode String
+    | BonusPercent Int
+    | BonusThreshold Int
+    | CardPrice Int
 
 
 type Faze
@@ -228,42 +161,98 @@ type Faze
 
 update : Msg -> Model -> ( Model, Maybe Msg )
 update msg model =
+    let
+        settings =
+            model.exchange.settings
+    in
     case msg of
         RadioMsg switch ->
             let
-                settings =
-                    model.exchange.settings
+                switches =
+                    model.switches
             in
             case switch of
                 Hopper faze ->
-                    ( changeSettings (setHopper faze settings) model, Nothing )
+                    let
+                        switchedModel =
+                            { model | switches = { switches | hopper = Hopper faze } }
+                    in
+                    ( changeSettings { settings | hopper = faze } switchedModel, Nothing )
 
                 HopperMode faze ->
-                    ( changeSettings (setHopperMode faze settings) model, Nothing )
+                    let
+                        switchedModel =
+                            { model | switches = { switches | hopperMode = HopperMode faze } }
+                    in
+                    ( changeSettings { settings | hopperMode = faze } switchedModel, Nothing )
 
                 BillValidator faze ->
-                    ( changeSettings (setBillValidator faze settings) model, Nothing )
-
-                BillNominal faze ->
-                    ( changeSettings (setBillNominal faze settings) model, Nothing )
+                    let
+                        switchedModel =
+                            { model | switches = { switches | billValidator = BillValidator faze } }
+                    in
+                    ( changeSettings { settings | billValidator = faze } switchedModel, Nothing )
 
                 RfidReader1 faze ->
-                    ( changeSettings (setRfidReader1 faze settings) model, Nothing )
+                    let
+                        switchedModel =
+                            { model | switches = { switches | rfidReader1 = RfidReader1 faze } }
+                    in
+                    ( changeSettings { settings | rfidReader1 = faze } switchedModel, Nothing )
 
                 RfidReader2 faze ->
-                    ( changeSettings (setRfidReader2 faze settings) model, Nothing )
+                    let
+                        switchedModel =
+                            { model | switches = { switches | rfidReader2 = RfidReader2 faze } }
+                    in
+                    ( changeSettings { settings | rfidReader2 = faze } switchedModel, Nothing )
 
                 Dispenser faze ->
-                    ( changeSettings (setDispenser faze settings) model, Nothing )
+                    let
+                        switchedModel =
+                            { model | switches = { switches | dispenser = Dispenser faze } }
+                    in
+                    ( changeSettings { settings | dispenser = faze } switchedModel, Nothing )
 
                 CardOut faze ->
-                    ( changeSettings (setCardOut faze settings) model, Nothing )
+                    let
+                        switchedModel =
+                            { model | switches = { switches | cardOut = CardOut faze } }
+                    in
+                    ( changeSettings { settings | cardOut = faze } switchedModel, Nothing )
 
                 Network faze ->
-                    ( changeSettings (setNetwork faze settings) model, Nothing )
+                    let
+                        switchedModel =
+                            { model | switches = { switches | network = Network faze } }
+                    in
+                    ( changeSettings { settings | network = faze } switchedModel, Nothing )
 
-        SaveSetting ->
-            ( model, Nothing )
+        Inputs variable ->
+            case variable of
+                CoinNominal nominal ->
+                    ( changeSettings { settings | coinNominal = nominal } model, Nothing )
+
+                HopperCoinNominal nominal ->
+                    ( changeSettings { settings | hopperCoinNominal = nominal } model, Nothing )
+
+                BillNominal nominal ->
+                    ( changeSettings { settings | billNominal = nominal } model, Nothing )
+
+                DeviceId id ->
+                    ( changeSettings { settings | deviceId = id } model, Nothing )
+
+                ServerCode code ->
+                    ( changeSettings { settings | serverCode = code } model, Nothing )
+
+                BonusPercent percent ->
+                    ( changeSettings { settings | bonusPercent = percent } model, Nothing )
+
+                BonusThreshold threshold ->
+                    ( changeSettings { settings | bonusThreshold = threshold } model, Nothing )
+
+                CardPrice price ->
+                    ( changeSettings { settings | cardPrice = price } model, Nothing )
 
 
 changeSettings : Settings -> Model -> Model
@@ -273,132 +262,6 @@ changeSettings settings model =
             model.exchange
     in
     { model | exchange = { exchange | settings = settings } }
-
-
-setHopper : Faze -> Settings -> Settings
-setHopper faze settings =
-    case faze of
-        Disabled ->
-            { settings | hopper = 0 }
-
-        CcTalk ->
-            { settings | hopper = 1 }
-
-        Pulse ->
-            { settings | hopper = 2 }
-
-        _ ->
-            settings
-
-
-setHopperMode : Faze -> Settings -> Settings
-setHopperMode faze settings =
-    case faze of
-        Mode_1 ->
-            { settings | hopperMode = 0 }
-
-        Mode_2 ->
-            { settings | hopperMode = 1 }
-
-        _ ->
-            settings
-
-
-setBillValidator : Faze -> Settings -> Settings
-setBillValidator faze settings =
-    case faze of
-        Disabled ->
-            { settings | billValidator = 0 }
-
-        CcTalk ->
-            { settings | billValidator = 1 }
-
-        _ ->
-            settings
-
-
-setBillNominal : Faze -> Settings -> Settings
-setBillNominal faze settings =
-    case faze of
-        _ ->
-            settings
-
-
-setRfidReader1 : Faze -> Settings -> Settings
-setRfidReader1 faze settings =
-    case faze of
-        Disabled ->
-            { settings | rfidReader1 = 0 }
-
-        Enabled ->
-            { settings | rfidReader1 = 1 }
-
-        _ ->
-            settings
-
-
-setRfidReader2 : Faze -> Settings -> Settings
-setRfidReader2 faze settings =
-    case faze of
-        Disabled ->
-            { settings | rfidReader2 = 0 }
-
-        Enabled ->
-            { settings | rfidReader2 = 1 }
-
-        _ ->
-            settings
-
-
-setDispenser : Faze -> Settings -> Settings
-setDispenser faze settings =
-    case faze of
-        Disabled ->
-            { settings | dispenser = 0 }
-
-        CRT_531 ->
-            { settings | dispenser = 1 }
-
-        TCD_820M ->
-            { settings | dispenser = 2 }
-
-        _ ->
-            settings
-
-
-setCardOut : Faze -> Settings -> Settings
-setCardOut faze settings =
-    case faze of
-        ToGate ->
-            { settings | cardOut = 0 }
-
-        FullOut ->
-            { settings | cardOut = 1 }
-
-        _ ->
-            settings
-
-
-setNetwork : Faze -> Settings -> Settings
-setNetwork faze settings =
-    case faze of
-        None ->
-            { settings | network = 0 }
-
-        RS_485 ->
-            { settings | network = 1 }
-
-        Can ->
-            { settings | network = 2 }
-
-        Ethernet ->
-            { settings | network = 3 }
-
-        WiFi ->
-            { settings | network = 4 }
-
-        _ ->
-            settings
 
 
 
@@ -442,31 +305,492 @@ viewCounter pointers name =
         ]
 
 
-viewSettings : Settings -> Html Msg
-viewSettings settings =
+viewSettings : Settings -> Model -> Html Msg
+viewSettings settings model =
     Table.table
         { options = []
         , thead = Table.thead [] []
         , tbody =
             Table.tbody []
-                []
+                [ viewCoinNominal settings
+                , viewHopper settings model.switches
+                , viewHopperCoinNominal settings
+                , viewHopperMode settings model.switches
+                , viewBillValidator settings model.switches
+                , viewBillNominal settings
+                , viewRfidReader1 settings model.switches
+                , viewRfidReader2 settings model.switches
+                , viewDispenser settings model.switches
+                , viewCardOut settings model.switches
+                , viewCardPrice settings
+                , viewNetwork settings model.switches
+                , viewDeviceId settings
+                , viewServerCode settings
+                , viewBonusPercent settings
+                , viewBonusThreshold settings
+                ]
         }
 
 
+viewCoinNominal : Settings -> Table.Row Msg
+viewCoinNominal settings =
+    Table.tr []
+        [ Table.td []
+            [ text "Coin Nominal" ]
+        , Table.td []
+            [ InputGroup.config
+                (InputGroup.number
+                    [ Input.placeholder "Integer"
+                    , Input.value <|
+                        String.fromInt settings.coinNominal
+                    ]
+                )
+                |> InputGroup.successors
+                    [ InputGroup.button
+                        [ Button.secondary
+                        , Button.onClick <|
+                            Inputs <|
+                                CoinNominal settings.coinNominal
+                        ]
+                        [ text "Save" ]
+                    ]
+                |> InputGroup.view
+            ]
+        ]
 
--- viewSetting : Setting -> String -> Html Msg
--- viewSetting dvijeni name =
---     ButtonGroup.radioButtonGroup []
---         [ ButtonGroup.radioButton
---             (model.radioState == One)
---             [ Button.primary, Button.onClick <| RadioMsg One ]
---             [ text "One" ]
---         , ButtonGroup.radioButton
---             (model.radioState == Two)
---             [ Button.primary, Button.onClick <| RadioMsg Two ]
---             [ text "Two" ]
---         , ButtonGroup.radioButton
---             (model.radioState == Three)
---             [ Button.primary, Button.onClick <| RadioMsg Three ]
---             [ text "Three" ]
---         ]
+
+viewHopperCoinNominal : Settings -> Table.Row Msg
+viewHopperCoinNominal settings =
+    Table.tr []
+        [ Table.td []
+            [ text "Hopper Coin Nominal" ]
+        , Table.td []
+            [ InputGroup.config
+                (InputGroup.number
+                    [ Input.placeholder "Integer"
+                    , Input.value <|
+                        String.fromInt settings.hopperCoinNominal
+                    ]
+                )
+                |> InputGroup.successors
+                    [ InputGroup.button
+                        [ Button.secondary
+                        , Button.onClick <|
+                            Inputs <|
+                                HopperCoinNominal settings.coinNominal
+                        ]
+                        [ text "Save" ]
+                    ]
+                |> InputGroup.view
+            ]
+        ]
+
+
+viewBillNominal : Settings -> Table.Row Msg
+viewBillNominal settings =
+    Table.tr []
+        [ Table.td []
+            [ text "Bill Nominal" ]
+        , Table.td []
+            [ text "gago" ]
+        ]
+
+
+viewDeviceId : Settings -> Table.Row Msg
+viewDeviceId settings =
+    Table.tr []
+        [ Table.td []
+            [ text "Device ID" ]
+        , Table.td []
+            [ InputGroup.config
+                (InputGroup.text
+                    [ Input.placeholder "String"
+                    , Input.value <|
+                        settings.deviceId
+                    ]
+                )
+                |> InputGroup.successors
+                    [ InputGroup.button
+                        [ Button.secondary
+                        , Button.onClick <|
+                            Inputs <|
+                                DeviceId settings.deviceId
+                        ]
+                        [ text "Save" ]
+                    ]
+                |> InputGroup.view
+            ]
+        ]
+
+
+viewCardPrice : Settings -> Table.Row Msg
+viewCardPrice settings =
+    Table.tr []
+        [ Table.td []
+            [ text "Card Price" ]
+        , Table.td []
+            [ InputGroup.config
+                (InputGroup.number
+                    [ Input.placeholder "Integer"
+                    , Input.value <|
+                        String.fromInt <|
+                            settings.cardPrice
+                    ]
+                )
+                |> InputGroup.successors
+                    [ InputGroup.button
+                        [ Button.secondary
+                        , Button.onClick <|
+                            Inputs <|
+                                CardPrice settings.cardPrice
+                        ]
+                        [ text "Save" ]
+                    ]
+                |> InputGroup.view
+            ]
+        ]
+
+
+viewServerCode : Settings -> Table.Row Msg
+viewServerCode settings =
+    Table.tr []
+        [ Table.td []
+            [ text "Server Code" ]
+        , Table.td []
+            [ InputGroup.config
+                (InputGroup.text
+                    [ Input.placeholder "String"
+                    , Input.value <|
+                        settings.serverCode
+                    ]
+                )
+                |> InputGroup.successors
+                    [ InputGroup.button
+                        [ Button.secondary
+                        , Button.onClick <|
+                            Inputs <|
+                                ServerCode settings.serverCode
+                        ]
+                        [ text "Save" ]
+                    ]
+                |> InputGroup.view
+            ]
+        ]
+
+
+viewBonusPercent : Settings -> Table.Row Msg
+viewBonusPercent settings =
+    Table.tr []
+        [ Table.td []
+            [ text "Bonus Percent" ]
+        , Table.td []
+            [ InputGroup.config
+                (InputGroup.number
+                    [ Input.placeholder "Integer"
+                    , Input.value <|
+                        String.fromInt settings.bonusPercent
+                    ]
+                )
+                |> InputGroup.successors
+                    [ InputGroup.button
+                        [ Button.secondary
+                        , Button.onClick <|
+                            Inputs <|
+                                BonusPercent settings.bonusPercent
+                        ]
+                        [ text "Save" ]
+                    ]
+                |> InputGroup.view
+            ]
+        ]
+
+
+viewBonusThreshold : Settings -> Table.Row Msg
+viewBonusThreshold settings =
+    Table.tr []
+        [ Table.td []
+            [ text "Bonus Threshold" ]
+        , Table.td []
+            [ InputGroup.config
+                (InputGroup.number
+                    [ Input.placeholder "Number"
+                    , Input.value <|
+                        String.fromInt settings.bonusThreshold
+                    ]
+                )
+                |> InputGroup.successors
+                    [ InputGroup.button
+                        [ Button.secondary
+                        , Button.onClick <|
+                            Inputs <|
+                                BonusThreshold settings.bonusThreshold
+                        ]
+                        [ text "Save" ]
+                    ]
+                |> InputGroup.view
+            ]
+        ]
+
+
+viewHopper : Settings -> Switches -> Table.Row Msg
+viewHopper settings switches =
+    Table.tr []
+        [ Table.td []
+            [ text "Hopper" ]
+        , Table.td []
+            [ ButtonGroup.radioButtonGroup []
+                [ ButtonGroup.radioButton
+                    (switches.hopper == Hopper Disabled)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            Hopper Disabled
+                    ]
+                    [ text "Disabled" ]
+                , ButtonGroup.radioButton
+                    (switches.hopper == Hopper CcTalk)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            Hopper CcTalk
+                    ]
+                    [ text "CcTalk" ]
+                , ButtonGroup.radioButton
+                    (switches.hopper == Hopper Pulse)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            Hopper Pulse
+                    ]
+                    [ text "Pulse" ]
+                ]
+            ]
+        ]
+
+
+viewHopperMode : Settings -> Switches -> Table.Row Msg
+viewHopperMode settings switches =
+    Table.tr []
+        [ Table.td []
+            [ text "Hopper Mode" ]
+        , Table.td []
+            [ ButtonGroup.radioButtonGroup []
+                [ ButtonGroup.radioButton
+                    (switches.hopperMode == HopperMode Mode_1)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            HopperMode Mode_1
+                    ]
+                    [ text "Mode 1" ]
+                , ButtonGroup.radioButton
+                    (switches.hopperMode == HopperMode Mode_2)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            HopperMode Mode_2
+                    ]
+                    [ text "Mode 2" ]
+                ]
+            ]
+        ]
+
+
+viewBillValidator : Settings -> Switches -> Table.Row Msg
+viewBillValidator settings switches =
+    Table.tr []
+        [ Table.td []
+            [ text "Bill Validator" ]
+        , Table.td []
+            [ ButtonGroup.radioButtonGroup []
+                [ ButtonGroup.radioButton
+                    (switches.billValidator == BillValidator Disabled)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            BillValidator Disabled
+                    ]
+                    [ text "Disabled" ]
+                , ButtonGroup.radioButton
+                    (switches.billValidator == BillValidator CcTalk)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            BillValidator CcTalk
+                    ]
+                    [ text "CcTalk" ]
+                ]
+            ]
+        ]
+
+
+viewRfidReader1 : Settings -> Switches -> Table.Row Msg
+viewRfidReader1 settings switches =
+    Table.tr []
+        [ Table.td []
+            [ text "RFID Reader 1" ]
+        , Table.td []
+            [ ButtonGroup.radioButtonGroup []
+                [ ButtonGroup.radioButton
+                    (switches.rfidReader1 == RfidReader1 Disabled)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            RfidReader1 Disabled
+                    ]
+                    [ text "Disabled" ]
+                , ButtonGroup.radioButton
+                    (switches.rfidReader1 == RfidReader1 Enabled)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            RfidReader1 Enabled
+                    ]
+                    [ text "Enabled" ]
+                ]
+            ]
+        ]
+
+
+viewRfidReader2 : Settings -> Switches -> Table.Row Msg
+viewRfidReader2 settings switches =
+    Table.tr []
+        [ Table.td []
+            [ text "RFID Reader 2" ]
+        , Table.td []
+            [ ButtonGroup.radioButtonGroup []
+                [ ButtonGroup.radioButton
+                    (switches.rfidReader2 == RfidReader2 Disabled)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            RfidReader2 Disabled
+                    ]
+                    [ text "Disabled" ]
+                , ButtonGroup.radioButton
+                    (switches.rfidReader2 == RfidReader2 Enabled)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            RfidReader2 Enabled
+                    ]
+                    [ text "Enabled" ]
+                ]
+            ]
+        ]
+
+
+viewDispenser : Settings -> Switches -> Table.Row Msg
+viewDispenser settings switches =
+    Table.tr []
+        [ Table.td []
+            [ text "Dispenser" ]
+        , Table.td []
+            [ ButtonGroup.radioButtonGroup []
+                [ ButtonGroup.radioButton
+                    (switches.dispenser == Dispenser Disabled)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            Dispenser Disabled
+                    ]
+                    [ text "Disabled" ]
+                , ButtonGroup.radioButton
+                    (switches.dispenser == Dispenser CRT_531)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            Dispenser CRT_531
+                    ]
+                    [ text "CRT 531" ]
+                , ButtonGroup.radioButton
+                    (switches.dispenser == Dispenser TCD_820M)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            Dispenser TCD_820M
+                    ]
+                    [ text "TCD 820M" ]
+                ]
+            ]
+        ]
+
+
+viewCardOut : Settings -> Switches -> Table.Row Msg
+viewCardOut settings switches =
+    Table.tr []
+        [ Table.td []
+            [ text "Card Out" ]
+        , Table.td []
+            [ ButtonGroup.radioButtonGroup []
+                [ ButtonGroup.radioButton
+                    (switches.cardOut == CardOut ToGate)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            CardOut ToGate
+                    ]
+                    [ text "To Gate" ]
+                , ButtonGroup.radioButton
+                    (switches.cardOut == CardOut FullOut)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            CardOut FullOut
+                    ]
+                    [ text "Full Out" ]
+                ]
+            ]
+        ]
+
+
+viewNetwork : Settings -> Switches -> Table.Row Msg
+viewNetwork settings switches =
+    Table.tr []
+        [ Table.td []
+            [ text "Network" ]
+        , Table.td []
+            [ ButtonGroup.radioButtonGroup []
+                [ ButtonGroup.radioButton
+                    (switches.network == Network None)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            Network None
+                    ]
+                    [ text "None" ]
+                , ButtonGroup.radioButton
+                    (switches.network == Network RS_485)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            Network RS_485
+                    ]
+                    [ text "RS 485" ]
+                , ButtonGroup.radioButton
+                    (switches.network == Network Can)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            Network Can
+                    ]
+                    [ text "Can" ]
+                , ButtonGroup.radioButton
+                    (switches.network == Network Ethernet)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            Network Ethernet
+                    ]
+                    [ text "Ethernet" ]
+                , ButtonGroup.radioButton
+                    (switches.network == Network WiFi)
+                    [ Button.primary
+                    , Button.onClick <|
+                        RadioMsg <|
+                            Network WiFi
+                    ]
+                    [ text "WiFi" ]
+                ]
+            ]
+        ]
