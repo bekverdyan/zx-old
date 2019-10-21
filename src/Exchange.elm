@@ -1,4 +1,4 @@
-module Exchange exposing (Exchange)
+module Exchange exposing (Exchange, Msg(..), preset, update)
 
 import Bootstrap.Button as Button
 import Bootstrap.ButtonGroup as ButtonGroup
@@ -75,6 +75,13 @@ type alias Settings =
 -- HELPERS
 
 
+preset : Exchange
+preset =
+    { counters = countersPreset
+    , settings = settingsPreset
+    }
+
+
 countersPreset : Counters
 countersPreset =
     { billCach = ( 0, 0 )
@@ -115,8 +122,8 @@ settingsPreset =
 
 
 type Msg
-    = RadioMsg Switch
-    | Inputs Variable
+    = ExchangeRadioMsg Switch
+    | ExchangeInputsMsg Variable
 
 
 type Switch
@@ -166,7 +173,7 @@ update msg model =
             model.exchange.settings
     in
     case msg of
-        RadioMsg switch ->
+        ExchangeRadioMsg switch ->
             let
                 switches =
                     model.switches
@@ -228,7 +235,7 @@ update msg model =
                     in
                     ( changeSettings { settings | network = faze } switchedModel, Nothing )
 
-        Inputs variable ->
+        ExchangeInputsMsg variable ->
             case variable of
                 CoinNominal nominal ->
                     ( changeSettings { settings | coinNominal = nominal } model, Nothing )
@@ -349,7 +356,7 @@ viewCoinNominal settings =
                     [ InputGroup.button
                         [ Button.secondary
                         , Button.onClick <|
-                            Inputs <|
+                            ExchangeInputsMsg <|
                                 CoinNominal settings.coinNominal
                         ]
                         [ text "Save" ]
@@ -376,7 +383,7 @@ viewHopperCoinNominal settings =
                     [ InputGroup.button
                         [ Button.secondary
                         , Button.onClick <|
-                            Inputs <|
+                            ExchangeInputsMsg <|
                                 HopperCoinNominal settings.coinNominal
                         ]
                         [ text "Save" ]
@@ -413,7 +420,7 @@ viewDeviceId settings =
                     [ InputGroup.button
                         [ Button.secondary
                         , Button.onClick <|
-                            Inputs <|
+                            ExchangeInputsMsg <|
                                 DeviceId settings.deviceId
                         ]
                         [ text "Save" ]
@@ -441,7 +448,7 @@ viewCardPrice settings =
                     [ InputGroup.button
                         [ Button.secondary
                         , Button.onClick <|
-                            Inputs <|
+                            ExchangeInputsMsg <|
                                 CardPrice settings.cardPrice
                         ]
                         [ text "Save" ]
@@ -468,7 +475,7 @@ viewServerCode settings =
                     [ InputGroup.button
                         [ Button.secondary
                         , Button.onClick <|
-                            Inputs <|
+                            ExchangeInputsMsg <|
                                 ServerCode settings.serverCode
                         ]
                         [ text "Save" ]
@@ -495,7 +502,7 @@ viewBonusPercent settings =
                     [ InputGroup.button
                         [ Button.secondary
                         , Button.onClick <|
-                            Inputs <|
+                            ExchangeInputsMsg <|
                                 BonusPercent settings.bonusPercent
                         ]
                         [ text "Save" ]
@@ -522,7 +529,7 @@ viewBonusThreshold settings =
                     [ InputGroup.button
                         [ Button.secondary
                         , Button.onClick <|
-                            Inputs <|
+                            ExchangeInputsMsg <|
                                 BonusThreshold settings.bonusThreshold
                         ]
                         [ text "Save" ]
@@ -543,7 +550,7 @@ viewHopper settings switches =
                     (switches.hopper == Hopper Disabled)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             Hopper Disabled
                     ]
                     [ text "Disabled" ]
@@ -551,7 +558,7 @@ viewHopper settings switches =
                     (switches.hopper == Hopper CcTalk)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             Hopper CcTalk
                     ]
                     [ text "CcTalk" ]
@@ -559,7 +566,7 @@ viewHopper settings switches =
                     (switches.hopper == Hopper Pulse)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             Hopper Pulse
                     ]
                     [ text "Pulse" ]
@@ -579,7 +586,7 @@ viewHopperMode settings switches =
                     (switches.hopperMode == HopperMode Mode_1)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             HopperMode Mode_1
                     ]
                     [ text "Mode 1" ]
@@ -587,7 +594,7 @@ viewHopperMode settings switches =
                     (switches.hopperMode == HopperMode Mode_2)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             HopperMode Mode_2
                     ]
                     [ text "Mode 2" ]
@@ -607,7 +614,7 @@ viewBillValidator settings switches =
                     (switches.billValidator == BillValidator Disabled)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             BillValidator Disabled
                     ]
                     [ text "Disabled" ]
@@ -615,7 +622,7 @@ viewBillValidator settings switches =
                     (switches.billValidator == BillValidator CcTalk)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             BillValidator CcTalk
                     ]
                     [ text "CcTalk" ]
@@ -635,7 +642,7 @@ viewRfidReader1 settings switches =
                     (switches.rfidReader1 == RfidReader1 Disabled)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             RfidReader1 Disabled
                     ]
                     [ text "Disabled" ]
@@ -643,7 +650,7 @@ viewRfidReader1 settings switches =
                     (switches.rfidReader1 == RfidReader1 Enabled)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             RfidReader1 Enabled
                     ]
                     [ text "Enabled" ]
@@ -663,7 +670,7 @@ viewRfidReader2 settings switches =
                     (switches.rfidReader2 == RfidReader2 Disabled)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             RfidReader2 Disabled
                     ]
                     [ text "Disabled" ]
@@ -671,7 +678,7 @@ viewRfidReader2 settings switches =
                     (switches.rfidReader2 == RfidReader2 Enabled)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             RfidReader2 Enabled
                     ]
                     [ text "Enabled" ]
@@ -691,7 +698,7 @@ viewDispenser settings switches =
                     (switches.dispenser == Dispenser Disabled)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             Dispenser Disabled
                     ]
                     [ text "Disabled" ]
@@ -699,7 +706,7 @@ viewDispenser settings switches =
                     (switches.dispenser == Dispenser CRT_531)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             Dispenser CRT_531
                     ]
                     [ text "CRT 531" ]
@@ -707,7 +714,7 @@ viewDispenser settings switches =
                     (switches.dispenser == Dispenser TCD_820M)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             Dispenser TCD_820M
                     ]
                     [ text "TCD 820M" ]
@@ -727,7 +734,7 @@ viewCardOut settings switches =
                     (switches.cardOut == CardOut ToGate)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             CardOut ToGate
                     ]
                     [ text "To Gate" ]
@@ -735,7 +742,7 @@ viewCardOut settings switches =
                     (switches.cardOut == CardOut FullOut)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             CardOut FullOut
                     ]
                     [ text "Full Out" ]
@@ -755,7 +762,7 @@ viewNetwork settings switches =
                     (switches.network == Network None)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             Network None
                     ]
                     [ text "None" ]
@@ -763,7 +770,7 @@ viewNetwork settings switches =
                     (switches.network == Network RS_485)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             Network RS_485
                     ]
                     [ text "RS 485" ]
@@ -771,7 +778,7 @@ viewNetwork settings switches =
                     (switches.network == Network Can)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             Network Can
                     ]
                     [ text "Can" ]
@@ -779,7 +786,7 @@ viewNetwork settings switches =
                     (switches.network == Network Ethernet)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             Network Ethernet
                     ]
                     [ text "Ethernet" ]
@@ -787,7 +794,7 @@ viewNetwork settings switches =
                     (switches.network == Network WiFi)
                     [ Button.primary
                     , Button.onClick <|
-                        RadioMsg <|
+                        ExchangeRadioMsg <|
                             Network WiFi
                     ]
                     [ text "WiFi" ]
