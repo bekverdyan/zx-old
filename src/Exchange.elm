@@ -1,4 +1,4 @@
-module Exchange exposing (Model)
+module Exchange exposing (Exchange)
 
 import Bootstrap.Button as Button
 import Bootstrap.ButtonGroup as ButtonGroup
@@ -75,8 +75,8 @@ type alias Settings =
 -- HELPERS
 
 
-defaultCounters : Counters
-defaultCounters =
+countersPreset : Counters
+countersPreset =
     { billCach = ( 0, 0 )
     , coinCach = ( 0, 0 )
     , cardRechargeCach = ( 0, 0 )
@@ -89,8 +89,8 @@ defaultCounters =
     }
 
 
-defaultSettings : Settings
-defaultSettings =
+settingsPreset : Settings
+settingsPreset =
     { coinNominal = 0
     , hopper = Disabled
     , hopperCoinNominal = 0
