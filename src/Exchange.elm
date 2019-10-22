@@ -1,4 +1,4 @@
-module Exchange exposing (Exchange, Msg(..), preset, update)
+module Exchange exposing (Counters, Msg(..), Settings, countersPreset, settingsPreset, update, viewCounters, viewSettings)
 
 import Bootstrap.Button as Button
 import Bootstrap.ButtonGroup as ButtonGroup
@@ -15,7 +15,8 @@ import Html.Events exposing (..)
 
 
 type alias Model =
-    { exchange : Exchange
+    { counters : Counters
+    , settings : Settings
     , switches : Switches
     }
 
@@ -29,12 +30,6 @@ type alias Switches =
     , dispenser : Switch
     , cardOut : Switch
     , network : Switch
-    }
-
-
-type alias Exchange =
-    { counters : Counters
-    , settings : Settings
     }
 
 
@@ -73,13 +68,6 @@ type alias Settings =
 
 
 -- HELPERS
-
-
-preset : Exchange
-preset =
-    { counters = countersPreset
-    , settings = settingsPreset
-    }
 
 
 countersPreset : Counters
@@ -170,7 +158,7 @@ update : Msg -> Model -> ( Model, Maybe Msg )
 update msg model =
     let
         settings =
-            model.exchange.settings
+            model.settings
     in
     case msg of
         ExchangeRadioMsg switch ->
@@ -264,11 +252,7 @@ update msg model =
 
 changeSettings : Settings -> Model -> Model
 changeSettings settings model =
-    let
-        exchange =
-            model.exchange
-    in
-    { model | exchange = { exchange | settings = settings } }
+    { model | settings = settings }
 
 
 

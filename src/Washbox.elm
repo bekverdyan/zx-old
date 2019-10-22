@@ -1,4 +1,4 @@
-module Washbox exposing (Msg(..), Washbox, viewChannels, viewCounters)
+module Washbox exposing (Channels, Counters, Msg(..), channelsPreset, countersPreset, viewChannels, viewCounters)
 
 import Bootstrap.Button as Button
 import Bootstrap.Card as Card
@@ -13,18 +13,8 @@ import Html exposing (..)
 --MODEL
 
 
-type alias Washbox =
-    { info : DeviceInfo
-    , counters : List Counter
-    , channels : Channels
-    }
-
-
-type alias DeviceInfo =
-    { model : String
-    , version : String
-    , softVersion : String
-    }
+type alias Counters =
+    List Counter
 
 
 type alias Counter =
@@ -68,33 +58,29 @@ type Resource
 --HELPERS
 
 
-preset : Washbox
-preset =
-    { info =
-        { model = "Հարթուկ"
-        , version = "8.1"
-        , softVersion = "12.0.1"
-        }
-    , counters =
-        [ ( 0, 0 )
-        , ( 0, 0 )
-        , ( 0, 0 )
-        , ( 0, 0 )
-        , ( 0, 0 )
-        , ( 0, 0 )
-        ]
-    , channels =
-        { actual = 6
-        , defined =
-            [ ( 1
-              , [ { resource = Water
-                  , unit = Liter
-                  , value = 0
-                  }
-                ]
-              )
+countersPreset : Counters
+countersPreset =
+    [ ( 0, 0 )
+    , ( 0, 0 )
+    , ( 0, 0 )
+    , ( 0, 0 )
+    , ( 0, 0 )
+    , ( 0, 0 )
+    ]
+
+
+channelsPreset : Channels
+channelsPreset =
+    { actual = 6
+    , defined =
+        [ ( 1
+          , [ { resource = Water
+              , unit = Liter
+              , value = 0
+              }
             ]
-        }
+          )
+        ]
     }
 
 
@@ -141,7 +127,7 @@ resourceName resource =
 
 
 type Msg
-    = WashboxChange Resource
+    = WashboxMsg Resource
 
 
 
@@ -204,7 +190,7 @@ viewComponent component =
                 [ InputGroup.button
                     [ Button.secondary
                     , Button.onClick <|
-                        WashboxChange component.resource
+                        WashboxMsg component.resource
                     ]
                     [ text "Save" ]
                 ]
