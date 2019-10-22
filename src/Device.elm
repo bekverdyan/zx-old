@@ -1,9 +1,10 @@
-module Device exposing (Model)
+module Device exposing (Common, Msg, view)
 
 import Bootstrap.Tab as Tab
+import Bootstrap.Utilities.Spacing as Spacing
+import Exchange
 import Html exposing (..)
-import Html.Attributes
-import Html.Events
+import Washbox
 
 
 
@@ -11,69 +12,27 @@ import Html.Events
 
 
 type alias Model =
-    { device : Device
+    { device : Common
     , tabState : Tab.State
     }
 
 
-type alias Device =
+type alias Common =
     { info : String
-    , config : Config
-    , counter : Counter
+    , counters : Counters
+    , configs : Configs
     , log : Int
     }
 
 
-type Config
-    = Washbox Int (List Channel)
-    | Exchange Int Int
+type Counters
+    = WashboxCounters Washbox.Counters
+    | ExchangeCounters Exchange.Counters
 
 
-type alias Counter =
-    { channelId : Int
-    , component : Component
-    , pointer : Int
-    }
-
-
-type alias ExchangeConfig =
-    { coinNominal : Int
-    , hopperCoinNominal : Int
-    }
-
-
-type alias ExchangeCounter =
-    { billCash : Int
-    , hopperCoin : Int
-    }
-
-
-type alias WashboxConfig =
-    { definedChannels : List Channel
-    , actualChannels : Int
-    }
-
-
-type alias Channel =
-    { id : Int
-    , components : List Component
-    }
-
-
-type alias Component =
-    { type_ : String
-    , unit : String
-    }
-
-
-type alias WashboxCounter =
-    List CounterData
-
-
-type alias CounterData =
-    { channelId : Int
-    , pointer : Int
-    }
+type Configs
+    = WashboxConfigs Washbox.Channels
+    | ExchangeConfigs Exchange.Settings
 
 
 
@@ -81,7 +40,8 @@ type alias CounterData =
 
 
 type Msg
-    = ChangeConfig
+    = TabMsg Tab.State
+    | WashboxMsg Washbox.Resource
 
 
 
@@ -90,8 +50,36 @@ type Msg
 
 view : Model -> Html Msg
 view model =
-    let
-        device =
-            model.device
-    in
-    text device.info
+    viewTab ( model.device.counters, model.device.configs ) model.tabState
+
+
+viewTab : ( Counters, Configs ) -> Tab.State -> Html Msg
+viewTab ( counters, configs ) tabState =
+    Tab.config
+        TabMsg
+        |> Tab.items
+            [ Tab.item
+                { id = "counters"
+                , link = Tab.link [] [ text "Counters" ]
+                , pane =
+                    Tab.pane [ Spacing.mt3 ]
+                        [ text "counters" ]
+                }
+            , Tab.item
+                { id = "settings"
+                , link = Tab.link [] [ text "Settings" ]
+                , pane =
+                    Tab.pane [ Spacing.mt3 ]
+                        [ text "configs" ]
+                }
+            ]
+        |> Tab.view tabState
+
+
+
+-- viewConfigs : Configs -> Html Msg
+-- viewConfigs configs =
+--     case configs of
+--         WashboxConfigs channels ->
+--             Washbox.viewChannels channels
+--         Exchange

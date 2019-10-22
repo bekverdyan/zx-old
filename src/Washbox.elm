@@ -155,9 +155,9 @@ viewCounter counter =
         ]
 
 
-viewChannels : List Channel -> Html Msg
+viewChannels : Channels -> Html Msg
 viewChannels channels =
-    div [] <| List.map viewChannel channels
+    div [] <| List.map viewChannel channels.defined
 
 
 viewChannel : Channel -> Html Msg
