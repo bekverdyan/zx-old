@@ -1,4 +1,4 @@
-module Device exposing (Common, Msg, view)
+module Device exposing (Common, Model, Msg, init, view)
 
 import Bootstrap.Tab as Tab
 import Bootstrap.Utilities.Spacing as Spacing
@@ -35,13 +35,24 @@ type Configs
     | ExchangeConfigs Exchange.Settings
 
 
+init : Model
+init =
+    Model
+        { info = ""
+        , counters = WashboxCounters Washbox.countersPreset
+        , configs = WashboxConfigs Washbox.channelsPreset
+        , log = 0
+        }
+        Tab.initialState
+
+
 
 --UPDATE
 
 
 type Msg
     = TabMsg Tab.State
-    | WashboxMsg Washbox.Resource
+    | WashboxMsg
 
 
 
