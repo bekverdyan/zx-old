@@ -1,4 +1,4 @@
-module Branch exposing (Model, Msg(..), view)
+module Branch exposing (Model, Msg(..), init, subscriptions, updateAccordion, view)
 
 import Bootstrap.Accordion as Accordion
 import Bootstrap.Button as Button
@@ -44,6 +44,19 @@ type Msg
 
 
 -- TODO Implement http receiver
+
+
+init : Model
+init =
+    Model [] <| Accordion.initialStateCardOpen "card1"
+
+
+updateAccordion : Accordion.State -> Model -> Model
+updateAccordion state model =
+    { model | accordionState = state }
+
+
+
 -- VIEW
 
 
@@ -91,3 +104,8 @@ viewDeviceLabel device =
             ]
             [ text device.name ]
         ]
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Accordion.subscriptions model.accordionState AccordionMsg
